@@ -70,4 +70,39 @@ function cpm_investor_register_post_type() {
 // Hook into the 'init' action
 add_action( 'init', 'cpm_investor_register_post_type', 0 );
 
+// Shortcode to display the form
+function cpm_investor_submission_form() {
+    ob_start();
+    ?>
+<form action="" method="post">
+    <label for="investor_name">Name of Investor:</label>
+    <input type="text" id="investor_name" name="investor_name" required><br />
+
+    <input type="submit" name="submit_investor" value="Submit">
+</form>
+<?php
+    return ob_get_clean();
+}
+add_shortcode('cpm_investor_form', 'cpm_investor_submission_form');
+
+// Handle form submission
+function cpm_investor_handle_form_submission() {
+    if ( isset( $_POST['submit_investor'] ) && isset( $_POST['investor_name'] ) ) {
+        $investor_name = sanitize_text_field( $_POST['investor_name'] );
+        
+
+        // Create a new post of type 'cpm_investor'
+        $new_post = array(
+            'post_title'   => $investor_name,
+            'post_status'  => 'draft',
+            'post_type'    => 'cpm_investor'
+        );
+
+        // Insert the post into the database
+        wp_insert_post( $new_post );
+    }
+}
+add_action( 'init', 'cpm_investor_handle_form_submission' );
 ?>
+
+
