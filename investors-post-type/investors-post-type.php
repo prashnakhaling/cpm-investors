@@ -91,7 +91,7 @@ add_shortcode('cpm_investor_form', 'cpm_investor_submission_form');
 function cpm_investor_handle_form_submission() {
     if ( isset( $_POST['submit_investor'] ) && isset( $_POST['investor_name'] ) ) {
         $investor_name = sanitize_text_field( $_POST['investor_name'] );
-        
+        $investor_description = sanitize_text_field($_POST['investor_name'] );
 
         // Create a new post of type 'cpm_investor'
         $new_post = array(
