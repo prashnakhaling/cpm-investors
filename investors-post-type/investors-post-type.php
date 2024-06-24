@@ -77,6 +77,8 @@ function cpm_investor_submission_form() {
 <form action="" method="post">
     <label for="investor_name">Name of Investor:</label>
     <input type="text" id="investor_name" name="investor_name" required><br />
+    <label for="investor_description">Short Description:</label>
+    <input type="text" id = "investor_description" name= "investor_description" required></br>
 
     <input type="submit" name="submit_investor" value="Submit">
 </form>
