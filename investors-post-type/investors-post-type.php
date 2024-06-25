@@ -2,7 +2,7 @@
 /*
 Plugin Name: CPM Investors Profile
 Description: A plugin to create a custom post type for Investors.
-Version: 1.0
+Version: 1.0.0
 Author:Ranju and Prashna
 License: GPL2
 */
