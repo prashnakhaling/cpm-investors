@@ -1,10 +1,9 @@
 <?php
 /*
 Plugin Name: CPM Investors Profile
-Plugin URI: https://example.com/
 Description: A plugin to create a custom post type for Investors.
 Version: 1.0
-Author: Ranju and Prashna
+Author:Ranju and Prasna
 License: GPL2
 */
 
@@ -76,9 +75,13 @@ function cpm_investor_submission_form() {
     ?>
 <form action="" method="post">
     <label for="investor_name">Name of Investor:</label>
-    <input type="text" id="investor_name" name="investor_name" required><br />
+    <input type="text" id="investor_name" name="investor_name" required><br><br>
+
     <label for="investor_description">Short Description:</label>
-    <input type="text" id = "investor_description" name= "investor_description" required></br>
+    <textarea id="investor_description" name="investor_description" rows="4" cols="50" required></textarea><br><br>
+
+    <label for="investor_founded">Founded in:</label>
+    <input type="date" id="investor_founded" name="investor_founded" required><br><br>
 
     <input type="submit" name="submit_investor" value="Submit">
 </form>
@@ -89,22 +92,58 @@ add_shortcode('cpm_investor_form', 'cpm_investor_submission_form');
 
 // Handle form submission
 function cpm_investor_handle_form_submission() {
-    if ( isset( $_POST['submit_investor'] ) && isset( $_POST['investor_name'] ) ) {
+    if ( isset( $_POST['submit_investor'] ) && isset( $_POST['investor_name'] ) && isset( $_POST['investor_description'] ) && isset( $_POST['investor_founded'] ) ) {
         $investor_name = sanitize_text_field( $_POST['investor_name'] );
-        $investor_description = sanitize_text_field($_POST['investor_name'] );
+        $investor_description = sanitize_textarea_field( $_POST['investor_description'] );
+        $investor_founded = sanitize_text_field( $_POST['investor_founded'] );
 
         // Create a new post of type 'cpm_investor'
         $new_post = array(
             'post_title'   => $investor_name,
+            'post_content' => $investor_description,
             'post_status'  => 'draft',
             'post_type'    => 'cpm_investor'
         );
 
         // Insert the post into the database
-        wp_insert_post( $new_post );
+        $post_id = wp_insert_post( $new_post );
+
+        // Save the 'founded in' year as post meta
+        if ( ! is_wp_error( $post_id ) ) {
+            update_post_meta( $post_id, 'cpm_investor_founded', $investor_founded );
+        }
     }
 }
 add_action( 'init', 'cpm_investor_handle_form_submission' );
+
+// Display the 'founded in' year in the post edit screen
+function cpm_investor_add_meta_box() {
+    add_meta_box(
+        'cpm_investor_founded',
+        'Founded in',
+        'cpm_investor_meta_box_callback',
+        'cpm_investor'
+    );
+}
+add_action( 'add_meta_boxes', 'cpm_investor_add_meta_box' );
+
+function cpm_investor_meta_box_callback( $post ) {
+    $value = get_post_meta( $post->ID, 'cpm_investor_founded', true );
+    ?>
+<label for="cpm_investor_founded">Founded in:</label>
+<input type="date" id="cpm_investor_founded" name="cpm_investor_founded" value="<?php echo esc_attr( $value ); ?>">
+<?php
+}
+
+// Save the 'founded in' year from the post edit screen
+function cpm_investor_save_meta_box_data( $post_id ) {
+    if ( array_key_exists( 'cpm_investor_founded', $_POST ) ) {
+        update_post_meta(
+            $post_id,
+            'cpm_investor_founded',
+            sanitize_text_field( $_POST['cpm_investor_founded'] )
+        );
+    }
+}
+add_action( 'save_post', 'cpm_investor_save_meta_box_data' );
 ?>
-
-
